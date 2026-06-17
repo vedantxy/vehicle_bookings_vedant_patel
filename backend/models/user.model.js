@@ -17,8 +17,8 @@ const userSchema = new mongoose.Schema(
       trim: true,
       validate: {
         validator: function(v) {
-          // Standard RFC 5322 compliant email regex validator
-          return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v);
+          // Standard RFC 5322 compliant email regex validator (supporting modern TLD lengths)
+          return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.[a-zA-Z]{2,10})+$/.test(v);
         },
         message: props => `${props.value} is not a valid email address`
       }
