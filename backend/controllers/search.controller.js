@@ -73,6 +73,9 @@ const searchVehicleByType = asyncHandler(async (req, res) => {
 
 const searchPickupLocation = asyncHandler(async (req, res) => {
   const { pickup } = req.query;
+  if (!pickup || String(pickup).trim() === "") {
+    return res.status(400).json({ success: false, message: "pickup query parameter is required" });
+  }
   const cleanPickup = escapeRegex(String(pickup).trim());
   const results = await Booking.find({ pickupLocation: { $regex: cleanPickup, $options: "i" }, isDeleted: false }).lean();
   return res.status(200).json({ success: true, count: results.length, data: results });
@@ -80,6 +83,9 @@ const searchPickupLocation = asyncHandler(async (req, res) => {
 
 const searchDropLocation = asyncHandler(async (req, res) => {
   const { drop } = req.query;
+  if (!drop || String(drop).trim() === "") {
+    return res.status(400).json({ success: false, message: "drop query parameter is required" });
+  }
   const cleanDrop = escapeRegex(String(drop).trim());
   const results = await Booking.find({ dropLocation: { $regex: cleanDrop, $options: "i" }, isDeleted: false }).lean();
   return res.status(200).json({ success: true, count: results.length, data: results });
