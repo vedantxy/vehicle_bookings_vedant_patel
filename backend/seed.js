@@ -8,6 +8,8 @@ dotenv.config();
 
 const connectDB = require("./config/db");
 const Booking = require("./models/booking.model");
+const User = require("./models/user.model");
+const bcrypt = require("bcryptjs");
 
 const seedDatabase = async () => {
   try {
@@ -69,6 +71,42 @@ const seedDatabase = async () => {
       const slice = cleanedRecords.slice(i, i + chunk);
       await Booking.insertMany(slice);
       console.log(`Inserted records ${i} to ${Math.min(i + chunk, cleanedRecords.length)}`);
+    }
+
+    console.log("Checking for default users...");
+    const adminEmail = "jane.admin@example.com";
+    const userEmail = "john.doe@example.com";
+
+    const existingAdmin = await User.findOne({ email: adminEmail });
+    if (!existingAdmin) {
+      console.log("Creating default admin user...");
+      const hashedPassword = await bcrypt.hash("password123", 10);
+      await User.create({
+        name: "Jane Admin",
+        email: adminEmail,
+        password: hashedPassword,
+        role: "admin",
+        isActive: true
+      });
+      console.log("Default admin created.");
+    } else {
+      console.log("Default admin already exists.");
+    }
+
+    const existingUser = await User.findOne({ email: userEmail });
+    if (!existingUser) {
+      console.log("Creating default regular user...");
+      const hashedPassword = await bcrypt.hash("password123", 10);
+      await User.create({
+        name: "John Doe",
+        email: userEmail,
+        password: hashedPassword,
+        role: "user",
+        isActive: true
+      });
+      console.log("Default regular user created.");
+    } else {
+      console.log("Default regular user already exists.");
     }
 
     console.log("✔ Seeding completed successfully!");
